@@ -1,0 +1,993 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thermal Physics Lab: Specific Heat & Latent Heat</title>
+    <!-- Tailwind CSS for playful, ultra-responsive school layout -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Google Fonts for joyful typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #fefcf0; /* Warm cheerful background */
+        }
+        .heading-font {
+            font-family: 'Fredoka', sans-serif;
+        }
+        .display-screen {
+            background-color: #0b132b;
+            box-shadow: inset 0 0 20px rgba(56, 189, 248, 0.3);
+        }
+    </style>
+</head>
+<body class="p-3 md:p-6 text-gray-800">
+
+    <!-- HEADER BLOCK -->
+    <header class="max-w-6xl mx-auto bg-gradient-to-r from-yellow-400 via-orange-400 to-amber-400 rounded-3xl p-6 shadow-xl mb-6 border-4 border-white flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="text-center sm:text-left">
+            <h1 class="heading-font text-3xl md:text-4xl text-white font-bold drop-shadow-md tracking-wide">
+                🔥 Thermal Physics Sandbox
+            </h1>
+            <p class="text-white text-sm font-semibold opacity-95 mt-1" id="main-subtitle">
+                Explore Heat, Mass, Temperature and States of Matter!
+            </p>
+        </div>
+        <button onclick="toggleLanguage()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-2xl shadow-md border-2 border-white transform active:scale-95 transition cursor-pointer flex items-center gap-2">
+            🌐 <span id="lang-btn-text">Bahasa Melayu</span>
+        </button>
+    </header>
+
+    <!-- MAIN SIM SELECTOR TABS -->
+    <nav class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-2 mb-6">
+        <button onclick="switchTab(1)" id="tab1" class="heading-font font-bold p-4 rounded-2xl border-b-4 transition text-sm md:text-base cursor-pointer bg-amber-400 border-amber-600 text-white shadow-md">
+            🧪 1. Specific Heat Capacity (c) / Muatan Haba Tentu (c)
+        </button>
+        <button onclick="switchTab(2)" id="tab2" class="heading-font font-bold p-4 rounded-2xl border-b-4 transition text-sm md:text-base cursor-pointer bg-white border-gray-300 text-gray-600 hover:bg-gray-50">
+            📈 2. Specific Latent Heat (L) / Haba Pendam Tentu (L)
+        </button>
+    </nav>
+
+    <!-- CONTENT DISPLAY CONTAINER -->
+    <main class="max-w-6xl mx-auto">
+
+        <!-- ========================================== -->
+        <!-- SIMULATION 1: SPECIFIC HEAT CAPACITY -->
+        <!-- ========================================== -->
+        <section id="sim1" class="bg-white rounded-3xl p-4 md:p-6 shadow-xl border-4 border-amber-400">
+            <h2 class="heading-font text-2xl font-bold text-amber-600 mb-4 flex items-center gap-2">
+                🌡️ <span data-key="sim1_title">Specific Heat Capacity Experiment</span>
+            </h2>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Simulation Sidebar Controls -->
+                <div class="lg:col-span-4 bg-amber-50 p-4 rounded-2xl border-2 border-amber-200 flex flex-col gap-4">
+                    <h3 class="font-bold text-amber-800" data-key="controls">Experimental Control Panel</h3>
+
+                    <!-- Substance State Selection -->
+                    <div>
+                        <label class="block font-semibold text-xs mb-1 text-gray-700" data-key="substance_select">Select Substance State & Type</label>
+                        <select id="substance-select" onchange="changeSubstance()" class="w-full bg-white border border-gray-300 rounded-xl p-2.5 text-sm font-semibold cursor-pointer">
+                            <option value="copper" data-state="solid">Solid: Copper (Cu) | c = 390 J/kg°C</option>
+                            <option value="aluminum" data-state="solid">Solid: Aluminum (Al) | c = 900 J/kg°C</option>
+                            <option value="water" data-state="liquid">Liquid: Water (H₂O) | c = 4200 J/kg°C</option>
+                            <option value="oil" data-state="liquid">Liquid: Cooking Oil | c = 2000 J/kg°C</option>
+                            <option value="helium" data-state="gas">Gas: Helium (He) | c = 3120 J/kg°C</option>
+                            <option value="co2" data-state="gas">Gas: Carbon Dioxide (CO₂) | c = 840 J/kg°C</option>
+                        </select>
+                    </div>
+
+                    <!-- Interactive Mass Slider -->
+                    <div>
+                        <label class="block font-semibold text-xs mb-1 text-gray-700 flex justify-between">
+                            <span>⚖️ <span data-key="mass_label">Mass</span> ($m$)</span>
+                            <span id="mass-label" class="text-amber-600 font-bold">2.0 kg</span>
+                        </label>
+                        <input type="range" id="sim1-mass" min="1" max="10" step="0.5" value="2.0" oninput="updateSliders()" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                    </div>
+
+                    <!-- Interactive Heater Power Slider -->
+                    <div>
+                        <label class="block font-semibold text-xs mb-1 text-gray-700 flex justify-between">
+                            <span>🔥 <span data-key="power_label">Heater Power</span> ($P$)</span>
+                            <span id="power-label" class="text-amber-600 font-bold">1000 W</span>
+                        </label>
+                        <input type="range" id="sim1-power" min="200" max="2000" step="100" value="1000" oninput="updateSliders()" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                    </div>
+
+                    <!-- Action Trigger Buttons -->
+                    <div class="flex gap-2">
+                        <button onclick="startSim1()" id="btn-start-1" class="flex-grow bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-xl shadow-md border-b-4 border-emerald-700 active:scale-95 transition cursor-pointer text-sm" data-key="btn_start">Start Experiment</button>
+                        <button onclick="resetSim1()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold px-4 py-3 rounded-xl border-b-4 border-gray-400 active:scale-95 transition cursor-pointer text-sm" data-key="btn_reset">Reset</button>
+                    </div>
+
+                    <!-- Instruction Box -->
+                    <div class="bg-white p-3 rounded-xl border border-amber-200 text-xs text-gray-600 leading-relaxed shadow-inner" id="sim1-help-text">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Simulation Visualizers -->
+                <div class="lg:col-span-8 flex flex-col gap-4">
+                    <!-- Physical Chamber and Lab Setup -->
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                        
+                        <!-- Canvas Display -->
+                        <div class="md:col-span-8 bg-slate-900 rounded-2xl p-4 border-2 border-slate-700 flex flex-col items-center justify-between min-h-[320px]">
+                            <span class="text-xs font-bold text-slate-400 tracking-wider uppercase mb-1" data-key="apparatus_setup">Interactive Laboratory Setup</span>
+                            <div class="w-full flex-grow relative flex items-center justify-center">
+                                <canvas id="canvas-apparatus" class="w-full h-full max-h-[250px] bg-slate-950 rounded-xl"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Instrumentation HUD (Stopwatch & Thermometer) -->
+                        <div class="md:col-span-4 bg-slate-950 rounded-2xl p-4 border-2 border-slate-700 flex flex-col items-center justify-between gap-4">
+                            <!-- Thermometer column container -->
+                            <div class="w-full flex-grow flex items-center justify-around">
+                                <div class="relative w-12 h-44 bg-slate-800 rounded-full flex flex-col items-center">
+                                    <div class="absolute bottom-1 w-8 h-8 bg-rose-500 rounded-full border-2 border-slate-900 shadow-lg shadow-rose-500/50"></div>
+                                    <!-- Temperature column tube -->
+                                    <div class="absolute bottom-5 w-3 bg-slate-700 rounded-t-full" style="height: 120px;"></div>
+                                    <div id="thermometer-bar" class="absolute bottom-5 w-3 bg-rose-500 rounded-t-full transition-all duration-100" style="height: 0px;"></div>
+                                    
+                                    <!-- Tick marks -->
+                                    <div class="absolute right-1 text-[8px] text-slate-400 flex flex-col justify-between h-32 py-2 pr-1 select-none">
+                                        <span>150°C</span><span>125°C</span><span>100°C</span><span>75°C</span><span>50°C</span><span>25°C</span>
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <span class="text-[10px] font-bold text-slate-400 block uppercase" data-key="temperature">Temperature</span>
+                                    <span id="temp-display" class="text-2xl font-bold text-rose-400 block heading-font">25.0 °C</span>
+                                    <span id="temp-delta-display" class="text-xs text-amber-300 font-semibold block mt-1">Δθ = 0.0 °C</span>
+                                </div>
+                            </div>
+
+                            <!-- Stopwatch element -->
+                            <div class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-center">
+                                <span class="text-[10px] font-bold text-slate-400 block uppercase" data-key="elapsed_time">Simulated Time</span>
+                                <span id="stopwatch-display" class="text-3xl font-bold text-sky-400 font-mono tracking-widest block">00:00</span>
+                                <span id="experiment-done-msg" class="text-[10px] text-emerald-400 font-bold block mt-1 hidden" data-key="exp_done">Experiment Complete (10 mins)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Formula Work Bench Calculations -->
+                    <div class="bg-sky-50 border-2 border-sky-200 rounded-2xl p-4 shadow-sm">
+                        <h4 class="font-bold text-sky-800 text-sm mb-2 flex items-center gap-1">
+                            📝 <span data-key="calc_title">Specific Heat Capacity Calculation Workspace</span>
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                            <div class="bg-white p-3 rounded-xl border border-sky-100 flex flex-col justify-between leading-relaxed">
+                                <div>
+                                    <span class="font-bold text-sky-950 block mb-1" data-key="heat_energy_title">Heat Supplied (Q) Formula:</span>
+                                    <p class="mb-2 font-mono text-gray-700 bg-slate-50 p-1.5 rounded border border-slate-100">$Q = P \times t$</p>
+                                    <p id="calc-q-step" class="text-gray-600 mt-1">Substitute values to find heat energy supplied.</p>
+                                </div>
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border border-sky-100 flex flex-col justify-between leading-relaxed">
+                                <div>
+                                    <span class="font-bold text-sky-950 block mb-1" data-key="shc_formula_title">Specific Heat Capacity (c) Formula:</span>
+                                    <p class="mb-2 font-mono text-gray-700 bg-slate-50 p-1.5 rounded border border-slate-100">$c = \frac{Q}{m \times \Delta\theta}$</p>
+                                    <p id="calc-c-step" class="text-gray-600 mt-1">Determine specific heat capacity of your experimental substance.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- SIMULATION 2: SPECIFIC LATENT HEAT -->
+        <!-- ========================================== -->
+        <section id="sim2" class="bg-white rounded-3xl p-4 md:p-6 shadow-xl border-4 border-cyan-400 hidden">
+            <h2 class="heading-font text-2xl font-bold text-cyan-600 mb-4 flex items-center gap-2">
+                📈 <span data-key="sim2_title">Heating & Cooling Curves of Water</span>
+            </h2>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Controls sidebar -->
+                <div class="lg:col-span-4 bg-cyan-50 p-4 rounded-2xl border-2 border-cyan-200 flex flex-col gap-4">
+                    <h3 class="font-bold text-cyan-800" data-key="controls">Experimental Control Panel</h3>
+
+                    <!-- Process Switch buttons -->
+                    <div>
+                        <label class="block font-semibold text-xs mb-1 text-gray-700" data-key="curve_direction">Process Curve Direction</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="setSim2Mode('heating')" id="btn-mode-heating" class="py-2.5 px-2 text-xs font-bold rounded-xl border-2 border-cyan-500 bg-cyan-500 text-white cursor-pointer transition">
+                                🔥 Heating Curve
+                            </button>
+                            <button onclick="setSim2Mode('cooling')" id="btn-mode-cooling" class="py-2.5 px-2 text-xs font-bold rounded-xl border-2 border-gray-200 bg-white text-gray-700 hover:bg-gray-50 cursor-pointer transition">
+                                ❄️ Cooling Curve
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Trigger buttons -->
+                    <div class="flex gap-2">
+                        <button onclick="startSim2()" id="btn-start-2" class="flex-grow bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 rounded-xl shadow-md border-b-4 border-indigo-700 active:scale-95 transition cursor-pointer text-sm" data-key="btn_run">Run Process</button>
+                        <button onclick="resetSim2()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold px-4 py-3 rounded-xl border-b-4 border-gray-400 active:scale-95 transition cursor-pointer text-sm" data-key="btn_reset">Reset</button>
+                    </div>
+
+                    <!-- Educational Output HUD Card -->
+                    <div class="bg-white p-4 rounded-xl border border-cyan-200 shadow-sm">
+                        <h4 class="font-bold text-sm text-cyan-700 mb-1" id="phase-process-header">Ice Phase</h4>
+                        <span id="phase-substate-badge" class="inline-block px-2 py-0.5 text-[10px] font-black rounded-md text-white bg-blue-500 mb-2">SOLID (ICE)</span>
+                        <p class="text-xs text-gray-600 leading-relaxed shadow-inner p-2 bg-slate-50 border border-slate-100 rounded-lg overflow-y-auto max-h-48" id="sim2-explanation">
+                            Ice absorbs thermal energy. Molecules speed up. Temperature rises towards freezing point.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Live Graphing Display and Animation layout -->
+                <div class="lg:col-span-8 flex flex-col gap-4">
+                    <!-- Twin-Graph and Thermometer alignment screen -->
+                    <div class="bg-slate-900 border-2 border-slate-700 rounded-2xl p-4 flex flex-col md:flex-row gap-4">
+                        
+                        <!-- Synced Thermometer Column -->
+                        <div class="flex flex-row md:flex-col items-center justify-center gap-4 bg-slate-950 p-3 rounded-xl border border-slate-800 md:w-32">
+                            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center" data-key="thermometer">Thermometer</span>
+                            
+                            <div class="relative w-10 h-44 bg-slate-800 rounded-full flex flex-col items-center">
+                                <div class="absolute bottom-1 w-6 h-6 bg-cyan-400 rounded-full border-2 border-slate-900"></div>
+                                <div class="absolute bottom-4 w-2.5 bg-slate-700 rounded-t-full" style="height: 130px;"></div>
+                                <div id="sim2-thermometer-bar" class="absolute bottom-4 w-2.5 bg-cyan-400 rounded-t-full" style="height: 0px;"></div>
+                                
+                                <div class="absolute right-1 text-[7px] text-slate-400 flex flex-col justify-between h-36 py-2 select-none">
+                                    <span>120°C</span><span>100°C</span><span>75°C</span><span>50°C</span><span>25°C</span><span>0°C</span><span>-20°C</span>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <span id="sim2-temp-display" class="text-xl font-bold text-cyan-400 heading-font block">-20.0°C</span>
+                            </div>
+                        </div>
+
+                        <!-- Phase Curve Canvas plotting area -->
+                        <div class="flex-grow bg-slate-950 p-2 rounded-xl border border-slate-800 min-h-[260px] flex flex-col">
+                            <span class="text-[10px] font-bold text-slate-400 block tracking-wider uppercase mb-1 text-center" id="sim2-graph-title">Heating Curve Chart</span>
+                            <canvas id="canvas-curve-chart" class="w-full flex-grow rounded bg-slate-950"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Real-Life physical Phase transition Animation box -->
+                    <div class="bg-slate-900 rounded-2xl p-4 border-2 border-slate-700 flex flex-col items-center justify-between min-h-[160px]">
+                        <span class="text-xs font-bold text-slate-400 tracking-wider uppercase mb-2" data-key="phase_vis">Matter Phase Visual State (Water H₂O)</span>
+                        <div class="w-full flex-grow relative flex items-center justify-center">
+                            <canvas id="canvas-matter-vis" class="w-full h-full max-h-[120px] bg-slate-950 rounded-xl"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER SIGNATURE -->
+    <footer class="max-w-6xl mx-auto text-center mt-8 pb-8 text-xs font-semibold text-slate-400 tracking-wider">
+        MRSM GERIK PHYSICS DEPT © 2026 • DESIGNED FOR HIGH PERFORMANCE INTERACTIVE EDUCATION
+    </footer>
+
+    <!-- INTERACTIVE LAB LOGIC & PLOTTING SCRIPTS -->
+    <script>
+        // Language localization packs
+        const langData = {
+            en: {
+                main_subtitle: "Explore Heat, Mass, Temperature and States of Matter!",
+                controls: "Experimental Control Panel",
+                substance_select: "Select Substance State & Type",
+                mass_label: "Mass",
+                power_label: "Heater Power",
+                curve_direction: "Process Curve Direction",
+                btn_start: "Start Experiment",
+                btn_run: "Run Process",
+                btn_reset: "Reset",
+                apparatus_setup: "Interactive Laboratory Setup",
+                temperature: "Temperature",
+                elapsed_time: "Simulated Time",
+                exp_done: "Experiment Complete (10 mins)",
+                calc_title: "Specific Heat Capacity Calculation Workspace",
+                heat_energy_title: "Heat Supplied (Q) Formula:",
+                shc_formula_title: "Specific Heat Capacity (c) Formula:",
+                thermometer: "Thermometer",
+                phase_vis: "Matter Phase Visual State (Water H₂O)",
+                
+                // Sim 1 Substances and State names
+                solid_c: "Solid Metal: Copper (Cu)",
+                solid_al: "Solid Metal: Aluminum (Al)",
+                liq_w: "Liquid: Water",
+                liq_o: "Liquid: Cooking Oil",
+                gas_he: "Gas: Helium (He)",
+                gas_co: "Gas: Carbon Dioxide (CO₂)",
+                
+                // Help Texts for Sim 1
+                s1_help_idle: "Choose a substance, set the Mass and Heater Power, and click 'Start Experiment' to measure the temperature rise over a 10-minute period.",
+                s1_help_heating: "Heating active! Thermal energy is flowing. Temperature rise rate depends on: Specific Heat Capacity ($c$) and Mass ($m$). Higher $c$ or mass values result in a slower temperature rise.",
+                s1_help_done: "Done! Review the calculations on the card below. You can see how the specific heat capacity $c$ is determined using $Q = mc\\Delta\\theta$.",
+
+                // Process explanations - Heating Curve
+                s2_title_heat: "Water Heating Curve Chart",
+                s2_state_solid_h_title: "Ice Heating Process (Solid)",
+                s2_state_solid_h_desc: "Ice absorbs thermal heat energy. The energy increases the average kinetic energy of the water molecules, causing them to vibrate faster about their fixed crystal lattice positions. The temperature rises towards $0^{\\circ}\\text{C}$.",
+                
+                s2_state_melt_h_title: "Melting Ice Process (Phase Transition)",
+                s2_state_melt_h_desc: "The temperature remains constant at $0^{\\circ}\\text{C}$. The heat energy absorbed is entirely used as **Specific Latent Heat of Fusion** to break the strong inter-molecular bonds in the solid crystal lattice structure, converting ice into liquid water without any rise in molecular kinetic speed.",
+
+                s2_state_liq_h_title: "Liquid Water Heating Process (Liquid)",
+                s2_state_liq_h_desc: "All ice is now completely melted into water. Heat energy is again used to increase the kinetic energy of liquid molecules, making them slide around randomly and vigorously. Temperature climbs steadily from $0^{\\circ}\\text{C}$ to $100^{\\circ}\\text{C}$.",
+
+                s2_state_boil_h_title: "Boiling Process (Phase Transition)",
+                s2_state_boil_h_desc: "The temperature plateaus flat at $100^{\\circ}\\text{C}$. The heat energy supplied represents the **Specific Latent Heat of Vaporization**. It is fully consumed to overcome atmospheric pressure and break the remaining attractive forces between molecules to transform liquid water into gaseous steam.",
+
+                s2_state_gas_h_title: "Steam Heating Process (Gas)",
+                s2_state_gas_h_desc: "Water is completely evaporated into steam. Molecules move at very high velocities with large spatial separations. Extra heat energy raises the gas kinetic energy, allowing temperature to surge above $100^{\\circ}\\text{C}$ again.",
+
+                // Process explanations - Cooling Curve
+                s2_title_cool: "Water Cooling Curve Chart",
+                s2_state_gas_c_title: "Steam Cooling Process (Gas)",
+                s2_state_gas_c_desc: "Steam is releasing heat to the cold environment. Average molecular kinetic energy drops, gas particles slow down, and the temperature falls steadily toward $100^{\\circ}\\text{C}$.",
+
+                s2_state_cond_c_title: "Condensation Process (Phase Transition)",
+                s2_state_cond_c_desc: "Temperature holds constant at $100^{\\circ}\\text{C}$. The latent heat of vaporization is released. As the gas molecules condense back to liquid, attractive bonds are re-established, releasing energy to the surrounding atmosphere.",
+
+                s2_state_liq_c_title: "Water Cooling Process (Liquid)",
+                s2_state_liq_c_desc: "Heat energy continues to escape. Water molecular speeds slow down, causing a linear, constant temperature drop from $100^{\\circ}\\text{C}$ down toward the freezing threshold.",
+
+                s2_state_freeze_c_title: "Freezing Process (Phase Transition)",
+                s2_state_freeze_c_desc: "Temperature stabilizes exactly at $0^{\\circ}\\text{C}$. Specific latent heat of fusion is released. Attractive molecular links lock together to form the solid ice crystal structures.",
+
+                s2_state_solid_c_title: "Ice Cooling Process (Solid)",
+                s2_state_solid_c_desc: "All liquid water is frozen solid. As the ice continue to release thermal energy, the vibration speed of the crystal lattice drops, lowering the temperature below $0^{\\circ}\\text{C}$."
+            },
+            ms: {
+                main_subtitle: "Kaji kesan Haba, Jisim, Suhu dan Keadaan Jirim!",
+                controls: "Panel Kawalan Eksperimen",
+                substance_select: "Pilih Keadaan & Jenis Bahan",
+                mass_label: "Jisim",
+                power_label: "Kuasa Pemanas",
+                curve_direction: "Arah Proses Keluk",
+                btn_start: "Mula Eksperimen",
+                btn_run: "Mula Proses",
+                btn_reset: "Set Semula",
+                apparatus_setup: "Alat Radas Eksperimen Interaktif",
+                temperature: "Suhu",
+                elapsed_time: "Masa Simulasi",
+                exp_done: "Eksperimen Selesai (10 min)",
+                calc_title: "Ruang Pengiraan Muatan Haba Tentu",
+                heat_energy_title: "Formula Haba Dibekalkan (Q):",
+                shc_formula_title: "Formula Muatan Haba Tentu (c):",
+                thermometer: "Termometer",
+                phase_vis: "Fasa Jirim Sebenar (Air H₂O)",
+
+                solid_c: "Logam Pepejal: Kuprum (Cu)",
+                solid_al: "Logam Pepejal: Aluminium (Al)",
+                liq_w: "Cecair: Air",
+                liq_o: "Cecair: Minyak Masak",
+                gas_he: "Gas: Helium (He)",
+                gas_co: "Gas: Karbon Dioksida (CO₂)",
+
+                s1_help_idle: "Pilih jenis bahan, tetapkan Jisim dan Kuasa Pemanas, kemudian klik 'Mula Eksperimen' untuk mengukur kenaikan suhu dalam tempoh simulasi 10 minit.",
+                s1_help_heating: "Pemanasan sedang berjalan! Tenaga haba diserap masuk. Kadar peningkatan suhu bergantung kepada: Muatan Haba Tentu ($c$) dan Jisim ($m$). Nilai $c$ atau jisim yang lebih tinggi melambatkan kenaikan suhu.",
+                s1_help_done: "Selesai! Sila semak kad kerja pengiraan di bawah. Anda boleh melihat bagaimana nilai muatan haba tentu $c$ diperoleh menggunakan formula $Q = mc\\Delta\\theta$.",
+
+                s2_title_heat: "Carta Keluk Pemanasan Air",
+                s2_title_cool: "Carta Keluk Penyejukan Air",
+                s2_state_solid_h_title: "Proses Pemanasan Ais (Pepejal)",
+                s2_state_solid_h_desc: "Ais menyerap tenaga haba. Tenaga ini meningkatkan purata tenaga kinetik molekul-molekul air, menyebabkan ia bergetar dengan lebih pantas pada kedudukan tetap dalam kekisi hablur. Suhu meningkat ke arah $0^{\\circ}\\text{C}$.",
+
+                s2_state_melt_h_title: "Proses Peleburan Ais (Perubahan Fasa)",
+                s2_state_melt_h_desc: "Suhu kekal malar pada $0^{\\circ}\\text{C}$. Tenaga haba yang diserap digunakan sepenuhnya sebagai **Haba Pendam Tentu Pelakuran** untuk memutuskan ikatan antara molekul pepejal, menukarkan ais menjadi air cecair tanpa sebarang perubahan kelajuan kinetik molekul.",
+
+                s2_state_liq_h_title: "Proses Pemanasan Air Cecair (Cecair)",
+                s2_state_liq_h_desc: "Kesemua ais kini telah melebur sepenuhnya menjadi air. Tenaga haba digunakan sekali lagi untuk meningkatkan tenaga kinetik zarah, menyebabkannya menggelongsor dan bergerak rawak dengan lebih rancak. Suhu meningkat dari $0^{\\circ}\\text{C}$ ke $100^{\\circ}\\text{C}$.",
+
+                s2_state_boil_h_title: "Proses Pendidihan (Perubahan Fasa)",
+                s2_state_boil_h_desc: "Suhu kekal malar pada $100^{\\circ}\\text{C}$. Tenaga haba yang dibekalkan mewakili **Haba Pendam Tentu Pengewapan**. Tenaga ini digunakan sepenuhnya untuk mengatasi tekanan atmosfera dan memutuskan daya tarikan antara molekul cecair bagi menukarkan air menjadi stim.",
+
+                s2_state_gas_h_title: "Proses Pemanasan Stim (Gas)",
+                s2_state_gas_h_desc: "Air telah tersejat sepenuhnya menjadi gas stim. Molekul bergerak dengan halaju sangat tinggi dan berjarak jauh antara satu sama lain. Haba tambahan meningkatkan tenaga kinetik gas, menyebabkan suhu melonjak melebihi $100^{\\circ}\\text{C}$ semula.",
+
+                s2_state_gas_c_title: "Proses Penyejukan Stim (Gas)",
+                s2_state_gas_c_desc: "Stim membebaskan tenaga haba ke persekitaran yang sejuk. Purata tenaga kinetik berkurang, zarah gas bergerak lebih perlahan, dan suhu menurun ke arah $100^{\\circ}\\text{C}$.",
+
+                s2_state_cond_c_title: "Proses Kondensasi (Perubahan Fasa)",
+                s2_state_cond_c_desc: "Suhu kekal malar pada $100^{\\circ}\\text{C}$. Haba pendam tentu pengewapan dibebaskan ke persekitaran. Semasa gas bertukar menjadi cecair, ikatan tarikan antara molekul mula dibina semula.",
+
+                s2_state_liq_c_title: "Proses Penyejukan Air Cecair (Cecair)",
+                s2_state_liq_c_desc: "Haba terus dibebaskan. Pergerakan molekul air semakin perlahan, menyebabkan kejatuhan suhu secara linear dari $100^{\\circ}\\text{C}$ menuju ke takat beku.",
+
+                s2_state_freeze_c_title: "Proses Pembekuan (Perubahan Fasa)",
+                s2_state_freeze_c_desc: "Suhu kekal malar pada $0^{\\circ}\\text{C}$. Haba pendam tentu pelakuran dibebaskan. Ikatan tarikan mengunci kedudukan molekul-molekul menjadi struktur pepejal ais semula.",
+
+                s2_state_solid_c_title: "Proses Penyejukan Ais (Pepejal)",
+                s2_state_solid_c_desc: "Air cecair telah membeku sepenuhnya menjadi ais. Apabila ais terus membebaskan haba, getaran molekul pepejal semakin perlahan dan suhu menjunam ke bawah $0^{\\circ}\\text{C}$."
+            }
+        };
+
+        // Base physics attributes
+        const substanceProps = {
+            copper: { c: 390, color: '#f59e0b', state: 'solid' },
+            aluminum: { c: 900, color: '#94a3b8', state: 'solid' },
+            water: { c: 4200, color: '#38bdf8', state: 'liquid' },
+            oil: { c: 2000, color: '#facc15', state: 'liquid' },
+            helium: { c: 3120, color: '#ec4899', state: 'gas' },
+            co2: { c: 840, color: '#a855f7', state: 'gas' }
+        };
+
+        let currentLang = 'en';
+        let activeTab = 1;
+
+        // Simulation 1 State Variables
+        let sim1Active = false;
+        let sim1Timer = 0; // seconds, maximum simulated 10 minutes (600 seconds)
+        let sim1Temp = 25.0; // initial temp in °C
+        let sim1Mass = 2.0; // kg
+        let sim1Power = 1000; // W
+        let selectedSubstance = 'copper';
+        let sim1TargetMaxTime = 600; // 10 minutes simulated
+
+        // Simulation 2 State Variables
+        let sim2Active = false;
+        let sim2Mode = 'heating'; // heating or cooling
+        let sim2Progress = 0; // 0 to 100 percent
+        let sim2Temp = -20.0;
+        let sim2DataPoints = [];
+
+        // Particle configuration for micro visualizations
+        let particles = [];
+        for(let i=0; i<45; i++) {
+            particles.push({
+                x: Math.random() * 200 + 40,
+                y: Math.random() * 60 + 30,
+                vx: (Math.random() - 0.5) * 2,
+                vy: (Math.random() - 0.5) * 2
+            });
+        }
+
+        // INIT & BINDINGS
+        window.addEventListener('load', () => {
+            switchTab(1);
+            updateLanguageDOM();
+            startAnimationLoop();
+        });
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'ms' : 'en';
+            document.getElementById('lang-btn-text').innerText = currentLang === 'en' ? 'Bahasa Melayu' : 'English';
+            updateLanguageDOM();
+        }
+
+        function updateLanguageDOM() {
+            document.getElementById('main-subtitle').innerText = langData[currentLang].main_subtitle;
+            
+            // Map keys
+            document.querySelectorAll('[data-key]').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (langData[currentLang][key]) {
+                    el.innerHTML = langData[currentLang][key];
+                }
+            });
+
+            // Update localized explanations
+            updateS1HelpText();
+            updateSim2Labels();
+        }
+
+        function switchTab(idx) {
+            activeTab = idx;
+            const tab1 = document.getElementById('tab1');
+            const tab2 = document.getElementById('tab2');
+            const sim1 = document.getElementById('sim1');
+            const sim2 = document.getElementById('sim2');
+
+            if (idx === 1) {
+                sim1.classList.remove('hidden');
+                sim2.classList.add('hidden');
+                tab1.className = "heading-font font-bold p-4 rounded-2xl border-b-4 transition text-sm md:text-base cursor-pointer bg-amber-400 border-amber-600 text-white shadow-md";
+                tab2.className = "heading-font font-bold p-4 rounded-2xl border-b-4 transition text-sm md:text-base cursor-pointer bg-white border-gray-300 text-gray-600 hover:bg-gray-50";
+            } else {
+                sim1.classList.add('hidden');
+                sim2.classList.remove('hidden');
+                tab2.className = "heading-font font-bold p-4 rounded-2xl border-b-4 transition text-sm md:text-base cursor-pointer bg-cyan-400 border-cyan-600 text-white shadow-md";
+                tab1.className = "heading-font font-bold p-4 rounded-2xl border-b-4 transition text-sm md:text-base cursor-pointer bg-white border-gray-300 text-gray-600 hover:bg-gray-50";
+            }
+            setTimeout(resizeCanvases, 50);
+        }
+
+        function resizeCanvases() {
+            const ids = ['canvas-apparatus', 'canvas-curve-chart', 'canvas-matter-vis'];
+            ids.forEach(id => {
+                const c = document.getElementById(id);
+                if (c && c.offsetParent !== null) {
+                    c.width = c.clientWidth * window.devicePixelRatio;
+                    c.height = c.clientHeight * window.devicePixelRatio;
+                }
+            });
+        }
+        window.addEventListener('resize', resizeCanvases);
+
+        // ==========================================
+        // SIMULATION 1 ACTIONS
+        // ==========================================
+        function changeSubstance() {
+            if(sim1Active) return;
+            selectedSubstance = document.getElementById('substance-select').value;
+            resetSim1();
+        }
+
+        function updateSliders() {
+            sim1Mass = parseFloat(document.getElementById('sim1-mass').value);
+            sim1Power = parseFloat(document.getElementById('sim1-power').value);
+            document.getElementById('mass-label').innerText = `${sim1Mass.toFixed(1)} kg`;
+            document.getElementById('power-label').innerText = `${sim1Power} W`;
+            updateS1Workspace();
+        }
+
+        function startSim1() {
+            if (sim1Timer >= sim1TargetMaxTime) {
+                resetSim1();
+            }
+            sim1Active = true;
+            document.getElementById('btn-start-1').disabled = true;
+            document.getElementById('btn-start-1').className = "flex-grow bg-slate-300 text-slate-500 font-bold py-3 px-4 rounded-xl text-sm cursor-not-allowed";
+            updateS1HelpText();
+        }
+
+        function resetSim1() {
+            sim1Active = false;
+            sim1Timer = 0;
+            sim1Temp = 25.0;
+            document.getElementById('experiment-done-msg').classList.add('hidden');
+            document.getElementById('btn-start-1').disabled = false;
+            document.getElementById('btn-start-1').className = "flex-grow bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-xl shadow-md border-b-4 border-emerald-700 active:scale-95 transition cursor-pointer text-sm";
+            updateS1HelpText();
+            updateS1Workspace();
+        }
+
+        function updateS1HelpText() {
+            const helpEl = document.getElementById('sim1-help-text');
+            if (!helpEl) return;
+            if (sim1Timer === 0) {
+                helpEl.innerHTML = langData[currentLang].s1_help_idle;
+            } else if (sim1Timer < sim1TargetMaxTime) {
+                helpEl.innerHTML = langData[currentLang].s1_help_heating;
+            } else {
+                helpEl.innerHTML = langData[currentLang].s1_help_done;
+            }
+        }
+
+        function updateS1Workspace() {
+            const currentSub = substanceProps[selectedSubstance];
+            const q_heat = sim1Power * sim1Timer; // Q = P * t
+            const delta_t = sim1Temp - 25.0;
+
+            const qStepEl = document.getElementById('calc-q-step');
+            const cStepEl = document.getElementById('calc-c-step');
+
+            if (currentLang === 'en') {
+                qStepEl.innerHTML = `
+                    <strong>Heat supplied (Q):</strong><br>
+                    $Q = ${sim1Power}\\text{ W} \\times ${Math.round(sim1Timer)}\\text{ s}$<br>
+                    $Q = \\mathbf{${Math.round(q_heat).toLocaleString()}\\text{ J}}$
+                `;
+                if (sim1Timer > 0 && delta_t > 0) {
+                    const computedC = q_heat / (sim1Mass * delta_t);
+                    cStepEl.innerHTML = `
+                        <strong>Specific Heat Capacity (c):</strong><br>
+                        $c = \\frac{${Math.round(q_heat)}\\text{ J}}{${sim1Mass.toFixed(1)}\\text{ kg} \\times ${delta_t.toFixed(1)}^{\\circ}\\text{C}}$<br>
+                        $c = \\mathbf{${Math.round(computedC).toLocaleString()}\\text{ J kg}^{-1}{^{\\circ}}\\text{C}^{-1}}$<br>
+                        <span class="text-emerald-600 font-bold">Standard Value for ${selectedSubstance.toUpperCase()}: ${currentSub.c} J/kg°C</span>
+                    `;
+                } else {
+                    cStepEl.innerHTML = `<em>Start experiment to calculate specific heat capacity.</em>`;
+                }
+            } else {
+                qStepEl.innerHTML = `
+                    <strong>Haba Dibekalkan (Q):</strong><br>
+                    $Q = ${sim1Power}\\text{ W} \\times ${Math.round(sim1Timer)}\\text{ s}$<br>
+                    $Q = \\mathbf{${Math.round(q_heat).toLocaleString()}\\text{ J}}$
+                `;
+                if (sim1Timer > 0 && delta_t > 0) {
+                    const computedC = q_heat / (sim1Mass * delta_t);
+                    cStepEl.innerHTML = `
+                        <strong>Muatan Haba Tentu (c):</strong><br>
+                        $c = \\frac{${Math.round(q_heat)}\\text{ J}}{${sim1Mass.toFixed(1)}\\text{ kg} \\times ${delta_t.toFixed(1)}^{\\circ}\\text{C}}$<br>
+                        $c = \\mathbf{${Math.round(computedC).toLocaleString()}\\text{ J kg}^{-1}{^{\\circ}}\\text{C}^{-1}}$<br>
+                        <span class="text-emerald-600 font-bold">Nilai Standard bagi ${selectedSubstance.toUpperCase()}: ${currentSub.c} J/kg°C</span>
+                    `;
+                } else {
+                    cStepEl.innerHTML = `<em>Mulakan eksperimen untuk melihat pengiraan muatan haba tentu.</em>`;
+                }
+            }
+        }
+
+        // ==========================================
+        // SIMULATION 2 ACTIONS
+        // ==========================================
+        function setSim2Mode(mode) {
+            if (sim2Active) return;
+            sim2Mode = mode;
+            document.getElementById('btn-mode-heating').className = mode === 'heating' 
+                ? "py-2.5 px-2 text-xs font-bold rounded-xl border-2 border-cyan-500 bg-cyan-500 text-white cursor-pointer transition"
+                : "py-2.5 px-2 text-xs font-bold rounded-xl border-2 border-gray-200 bg-white text-gray-700 hover:bg-gray-50 cursor-pointer transition";
+            document.getElementById('btn-mode-cooling').className = mode === 'cooling'
+                ? "py-2.5 px-2 text-xs font-bold rounded-xl border-2 border-cyan-500 bg-cyan-500 text-white cursor-pointer transition"
+                : "py-2.5 px-2 text-xs font-bold rounded-xl border-2 border-gray-200 bg-white text-gray-700 hover:bg-gray-50 cursor-pointer transition";
+            
+            document.getElementById('sim2-graph-title').innerText = mode === 'heating' 
+                ? langData[currentLang].s2_title_heat 
+                : langData[currentLang].s2_title_cool;
+            resetSim2();
+        }
+
+        function startSim2() {
+            if (sim2Progress >= 100) {
+                resetSim2();
+            }
+            sim2Active = true;
+            document.getElementById('btn-start-2').disabled = true;
+            document.getElementById('btn-start-2').className = "flex-grow bg-slate-300 text-slate-500 font-bold py-3 rounded-xl text-sm cursor-not-allowed";
+        }
+
+        function resetSim2() {
+            sim2Active = false;
+            sim2Progress = 0;
+            sim2Temp = sim2Mode === 'heating' ? -20 : 120;
+            sim2DataPoints = [];
+            document.getElementById('btn-start-2').disabled = false;
+            document.getElementById('btn-start-2').className = "flex-grow bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 rounded-xl shadow-md border-b-4 border-indigo-700 active:scale-95 transition cursor-pointer text-sm";
+            updateSim2Labels();
+        }
+
+        function getSim2Temperature(prog) {
+            if (sim2Mode === 'heating') {
+                if (prog <= 20) return -20 + (prog / 20) * 20; // -20 to 0 (Ice heating)
+                if (prog <= 45) return 0; // Melting plateau
+                if (prog <= 75) return 0 + ((prog - 45) / 30) * 100; // 0 to 100 (Water heating)
+                if (prog <= 93) return 100; // Boiling plateau
+                return 100 + ((prog - 93) / 7) * 20; // 100 to 120 (Steam heating)
+            } else {
+                if (prog <= 10) return 120 - (prog / 10) * 20; // 120 to 100 (Steam cooling)
+                if (prog <= 35) return 100; // Condensing plateau
+                if (prog <= 65) return 100 - ((prog - 35) / 30) * 100; // 100 to 0 (Water cooling)
+                if (prog <= 85) return 0; // Freezing plateau
+                return 0 - ((prog - 85) / 15) * 20; // 0 to -20 (Ice cooling)
+            }
+        }
+
+        function updateSim2Labels() {
+            const hTitle = document.getElementById('phase-process-header');
+            const badge = document.getElementById('phase-substate-badge');
+            const desc = document.getElementById('sim2-explanation');
+
+            if (!hTitle || !badge || !desc) return;
+
+            if (sim2Mode === 'heating') {
+                if (sim2Temp < 0) {
+                    hTitle.innerText = langData[currentLang].s2_state_solid_h_title;
+                    badge.innerText = currentLang === 'en' ? "SOLID (ICE)" : "PEPEJAL (AIS)";
+                    badge.className = "inline-block px-2 py-0.5 text-[10px] font-black rounded-md text-white bg-blue-500";
+                    desc.innerHTML = langData[currentLang].s2_state_solid_h_desc;
+                } else if (sim2Temp === 0) {
+                    hTitle.innerText = langData[currentLang].s2_state_melt_h_title;
+                    badge.innerText = currentLang === 'en' ? "SOLID + LIQUID (MELTING)" : "PEPEJAL + CECAIR (PELEBURAN)";
+                    badge.className = "inline-block px-2 py-0.5 text-[10px] font-black rounded-md text-white bg-amber-500 animate-pulse";
+                    desc.innerHTML = langData[currentLang].s2_state_melt_h_desc;
+                } else if (sim2Temp > 0 && sim2Temp < 100) {
+                    hTitle.innerText = langData[currentLang].s2_state_liq_h_title;
+                    badge.innerText = currentLang === 'en' ? "LIQUID (WATER)" : "CECAIR (AIR)";
+                    badge.className = "inline-block px-2 py-0.5 text-[10px] font-black rounded-md text-white bg-teal-500";
+                    desc.innerHTML = langData[currentLang].s2_state_liq_h_desc;
+                } else if (sim2Temp === 100) {
+                    hTitle.innerText = langData[currentLang].s2_state_boil_h_title;
+                    badge.innerText = currentLang === 'en' ? "LIQUID + GAS (BOILING)" : "CECAIR + GAS (PENDIDIHAN)";
+                    badge.className = "inline-block px-2 py-0.5 text-[10px] font-black rounded-md text-white bg-orange-500 animate-pulse";
+                    desc.innerHTML = langData[currentLang].s2_state_boil_h_desc;
+                } else {
+                    hTitle.innerText = langData[currentLang].s2_state_gas_h_title;
+                    badge.innerText = currentLang === 'en' ? "GAS (STEAM)" : "GAS (STIM)";
+                    badge.className = "inline-block px-2 py-0.5 text-[10px] font-black rounded-md text-white bg-rose-500";
+                    desc.innerHTML = langData[currentLang].s2_state_gas_h_desc;
+                }
+            } else {
+                if (sim2Temp > 100) {
+                    hTitle.innerText = langData[currentLang].s2_state_gas_c_title;
+                    badge.innerText = currentLang === 'en' ? "GAS (STEAM)" : "GAS (STIM)";
+                    badge.className = "inline-block px-2 py-0.5 text-[10px] font-black rounded-md text-white bg-rose-500";
+                    desc.innerHTML = langData[currentLang].s2_state_gas_c_desc;
+                } else if (sim2Temp === 100) {
+                    hTitle.innerText = langData[currentLang].s2_state_cond_c_title;
+                    badge.innerText = currentLang === 'en' ? "GAS + LIQUID (CONDENSING)" : "GAS + CECAIR (KONDENSASI)";
+                    badge.className = "inline-block px-2 py-0.5 text-[10px] font-black rounded-md text-white bg-orange-500 animate-pulse";
+                    desc.innerHTML = langData[currentLang].s2_state_cond_c_desc;
+                } else if (sim2Temp > 0 && sim2Temp < 100) {
+                    hTitle.innerText = langData[currentLang].s2_state_liq_c_title;
+                    badge.innerText = currentLang === 'en' ? "LIQUID (WATER)" : "CECAIR (AIR)";
+                    badge.className = "inline-block px-2 py-0.5 text-[10px] font-black rounded-md text-white bg-teal-500";
+                    desc.innerHTML = langData[currentLang].s2_state_liq_c_desc;
+                } else if (sim2Temp === 0) {
+                    hTitle.innerText = langData[currentLang].s2_state_freeze_c_title;
+                    badge.innerText = currentLang === 'en' ? "LIQUID + SOLID (FREEZING)" : "CECAIR + PEPEJAL (PEMBEKUAN)";
+                    badge.className = "inline-block px-2 py-0.5 text-[10px] font-black rounded-md text-white bg-amber-500 animate-pulse";
+                    desc.innerHTML = langData[currentLang].s2_state_freeze_c_desc;
+                } else {
+                    hTitle.innerText = langData[currentLang].s2_state_solid_c_title;
+                    badge.innerText = currentLang === 'en' ? "SOLID (ICE)" : "PEPEJAL (AIS)";
+                    badge.className = "inline-block px-2 py-0.5 text-[10px] font-black rounded-md text-white bg-blue-500";
+                    desc.innerHTML = langData[currentLang].s2_state_solid_c_desc;
+                }
+            }
+        }
+
+
+        // ==========================================
+        // MAIN SIMULATOR ANIMATION TIMELINE ENGINE
+        // ==========================================
+        function startAnimationLoop() {
+            function update() {
+                if (activeTab === 1) {
+                    tickSimulation1();
+                } else if (activeTab === 2) {
+                    tickSimulation2();
+                }
+                requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
+        }
+
+        // --- SPECIFIC HEAT PHYSICS LOOP ---
+        function tickSimulation1() {
+            const currentSub = substanceProps[selectedSubstance];
+
+            if (sim1Active && sim1Timer < sim1TargetMaxTime) {
+                // Experiment is 10 minutes (600s). We speed up 1 real-second = 15 simulated-seconds
+                sim1Timer += 1.5;
+                if (sim1Timer >= sim1TargetMaxTime) {
+                    sim1Timer = sim1TargetMaxTime;
+                    sim1Active = false;
+                    document.getElementById('experiment-done-msg').classList.remove('hidden');
+                }
+
+                // Delta T = P*t / (m*c)
+                let energy_supplied = sim1Power * sim1Timer;
+                let dt = energy_supplied / (sim1Mass * currentSub.c);
+                sim1Temp = 25.0 + dt;
+
+                // Update Stopwatch Display
+                let mins = Math.floor(sim1Timer / 60);
+                let secs = Math.round(sim1Timer % 60);
+                document.getElementById('stopwatch-display').innerText = 
+                    `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                
+                // Keep workspace updated
+                updateS1Workspace();
+            }
+
+            // Render Apparatus Canvas
+            const canvas = document.getElementById('canvas-apparatus');
+            if (!canvas || canvas.offsetParent === null) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width; const h = canvas.height;
+            ctx.clearRect(0,0,w,h);
+
+            // Thermometer bar HUD mapping
+            let normTemp = Math.min(Math.max((sim1Temp - 25.0) / 125.0, 0), 1); // normalized 25C to 150C
+            document.getElementById('thermometer-bar').style.height = `${normTemp * 110}px`;
+            document.getElementById('temp-display').innerText = `${sim1Temp.toFixed(1)} °C`;
+            document.getElementById('temp-delta-display').innerText = `Δθ = ${(sim1Temp - 25.0).toFixed(1)} °C`;
+
+            // Draw Beaker / Chamber Boundary base on selected phase state
+            ctx.strokeStyle = '#64748b'; ctx.lineWidth = 4;
+            
+            if (currentSub.state === 'solid') {
+                // Draw a simple metal block resting on base
+                ctx.fillStyle = currentSub.color;
+                ctx.beginPath();
+                ctx.roundRect(w*0.35, h*0.35, w*0.3, h*0.4, 10);
+                ctx.fill();
+                ctx.stroke();
+
+                // Draw heater coil drill block inside metal
+                ctx.strokeStyle = sim1Active ? '#ef4444' : '#475569';
+                ctx.lineWidth = 5;
+                ctx.beginPath();
+                ctx.moveTo(w*0.5, h*0.1);
+                ctx.lineTo(w*0.5, h*0.65);
+                ctx.stroke();
+            } else if (currentSub.state === 'liquid') {
+                // Glass Beaker Outline
+                ctx.strokeStyle = '#cbd5e1';
+                ctx.lineWidth = 5;
+                ctx.beginPath();
+                ctx.moveTo(w*0.3, h*0.2);
+                ctx.lineTo(w*0.3, h*0.8);
+                ctx.lineTo(w*0.7, h*0.8);
+                ctx.lineTo(w*0.7, h*0.2);
+                ctx.stroke();
+
+                // Fluid level
+                ctx.fillStyle = currentSub.color + '90'; // alpha transparency
+                ctx.fillRect(w*0.305, h*0.4, w*0.39, h*0.39);
+
+                // Bubbles rising inside liquid if active
+                if (sim1Active) {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                    for (let p=0; p<12; p++) {
+                        let bx = w*0.32 + ((p * 27) % (w*0.35));
+                        let by = h*0.42 + ((p * 15 + Date.now()*0.05) % (h*0.35));
+                        ctx.beginPath(); ctx.arc(bx, by, 3, 0, Math.PI*2); ctx.fill();
+                    }
+                }
+
+                // Heater Coil inside beaker
+                ctx.strokeStyle = sim1Active ? '#ef4444' : '#475569';
+                ctx.lineWidth = 5;
+                ctx.beginPath();
+                ctx.moveTo(w*0.5, h*0.1);
+                ctx.lineTo(w*0.5, h*0.7);
+                ctx.stroke();
+            } else {
+                // Gas Sealed container box
+                ctx.strokeStyle = '#a1a1aa';
+                ctx.lineWidth = 6;
+                ctx.strokeRect(w*0.3, h*0.2, w*0.4, h*0.6);
+
+                // Gas particle physics collision simulation
+                particles.forEach(p => {
+                    p.x += p.vx * (sim1Active ? 2.5 : 0.8);
+                    p.y += p.vy * (sim1Active ? 2.5 : 0.8);
+
+                    // Box wall bounds checking
+                    if (p.x < w*0.32 || p.x > w*0.68) p.vx *= -1;
+                    if (p.y < h*0.22 || p.y > h*0.78) p.vy *= -1;
+
+                    ctx.fillStyle = currentSub.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 4, 0, Math.PI*2);
+                    ctx.fill();
+                });
+
+                // Heater inside sealed box
+                ctx.strokeStyle = sim1Active ? '#ef4444' : '#475569';
+                ctx.lineWidth = 5;
+                ctx.beginPath();
+                ctx.moveTo(w*0.5, h*0.1);
+                ctx.lineTo(w*0.5, h*0.75);
+                ctx.stroke();
+            }
+
+            // Heater Stand base plate rendering
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(w*0.25, h*0.8, w*0.5, 12);
+        }
+
+        // --- SPECIFIC LATENT HEAT PHYSICS LOOP ---
+        function tickSimulation2() {
+            if (sim2Active && sim2Progress < 100) {
+                sim2Progress += 0.2;
+                if (sim2Progress >= 100) {
+                    sim2Progress = 100;
+                    sim2Active = false;
+                    document.getElementById('btn-start-2').disabled = false;
+                    document.getElementById('btn-start-2').className = "flex-grow bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 rounded-xl shadow-md border-b-4 border-indigo-700 active:scale-95 transition cursor-pointer text-sm";
+                }
+                sim2Temp = getSim2Temperature(sim2Progress);
+                sim2DataPoints.push({ x: sim2Progress, y: sim2Temp });
+                updateSim2Labels();
+            }
+
+            // Thermometer bar HUD logic
+            let normTemp2 = Math.min(Math.max((sim2Temp - (-20)) / 140.0, 0), 1); // range -20C to 120C
+            document.getElementById('sim2-thermometer-bar').style.height = `${normTemp2 * 130}px`;
+            document.getElementById('sim2-temp-display').innerText = `${sim2Temp.toFixed(1)} °C`;
+
+            // Draw Curve Graph Canvas
+            const canvasC = document.getElementById('canvas-curve-chart');
+            if (canvasC && canvasC.offsetParent !== null) {
+                const ctxC = canvasC.getContext('2d');
+                const wC = canvasC.width; const hC = canvasC.height;
+                ctxC.clearRect(0,0,wC,hC);
+
+                // Grid background layout
+                ctxC.strokeStyle = '#143820'; ctxC.lineWidth = 1;
+                for (let i=0; i<wC; i+=25) { ctxC.beginPath(); ctxC.moveTo(i,0); ctxC.lineTo(i,hC); ctxC.stroke(); }
+                for (let j=0; j<hC; j+=25) { ctxC.beginPath(); ctxC.moveTo(0,j); ctxC.lineTo(wC,j); ctxC.stroke(); }
+
+                // Solid axis lines
+                ctxC.strokeStyle = '#1e5e2f'; ctxC.lineWidth = 1.5;
+                ctxC.beginPath(); ctxC.moveTo(40, 10); ctxC.lineTo(40, hC-25); ctxC.lineTo(wC-10, hC-25); ctxC.stroke();
+
+                // Draw standard background master target trace line
+                ctxC.strokeStyle = 'rgba(30, 94, 47, 0.4)'; ctxC.lineWidth = 2; ctxC.beginPath();
+                for (let p=0; p<=100; p++) {
+                    let t = getSim2Temperature(p);
+                    let gx = 40 + (p/100) * (wC - 60);
+                    let gy = hC - 25 - ((t - (-20)) / 140) * (hC - 50);
+                    if (p === 0) ctxC.moveTo(gx, gy); else ctxC.lineTo(gx, gy);
+                }
+                ctxC.stroke();
+
+                // Draw active progress trace line
+                if (sim2DataPoints.length > 0) {
+                    ctxC.strokeStyle = '#06b6d4'; ctxC.lineWidth = 4; ctxC.beginPath();
+                    sim2DataPoints.forEach((pt, index) => {
+                        let gx = 40 + (pt.x/100) * (wC - 60);
+                        let gy = hC - 25 - ((pt.y - (-20)) / 140) * (hC - 50);
+                        if (index === 0) ctxC.moveTo(gx, gy); else ctxC.lineTo(gx, gy);
+                    });
+                    ctxC.stroke();
+
+                    // Active blinking tracking dot
+                    let activePt = sim2DataPoints[sim2DataPoints.length - 1];
+                    let ax = 40 + (activePt.x/100) * (wC - 60);
+                    let ay = hC - 25 - ((activePt.y - (-20)) / 140) * (hC - 50);
+                    ctxC.fillStyle = '#e11d48';
+                    ctxC.beginPath(); ctxC.arc(ax, ay, 6, 0, Math.PI*2); ctxC.fill();
+                }
+            }
+
+            // Draw matter simulation visualization inside beaker at bottom
+            const canvasM = document.getElementById('canvas-matter-vis');
+            if (canvasM && canvasM.offsetParent !== null) {
+                const ctxM = canvasM.getContext('2d');
+                const wM = canvasM.width; const hM = canvasM.height;
+                ctxM.clearRect(0,0,wM,hM);
+
+                // Draw Container glass boundary
+                ctxM.strokeStyle = '#cbd5e1'; ctxM.lineWidth = 4;
+                ctxM.strokeRect(wM*0.35, hM*0.1, wM*0.3, hM*0.8);
+
+                // Phase states animations based on temperature
+                if (sim2Temp < 0) {
+                    // Ice block (ordered arrangement)
+                    ctxM.fillStyle = '#0ea5e9';
+                    ctxM.fillRect(wM*0.42, hM*0.4, wM*0.16, hM*0.4);
+                } else if (sim2Temp === 0) {
+                    // Slushy mix of Ice blocks and liquid water melting
+                    ctxM.fillStyle = '#bae6fd';
+                    ctxM.fillRect(wM*0.355, hM*0.5, wM*0.29, hM*0.38);
+                    ctxM.fillStyle = '#0ea5e9';
+                    ctxM.fillRect(wM*0.44, hM*0.55, wM*0.06, hM*0.25);
+                } else if (sim2Temp > 0 && sim2Temp < 100) {
+                    // Fully liquid state
+                    ctxM.fillStyle = '#38bdf8';
+                    ctxM.fillRect(wM*0.355, hM*0.45, wM*0.29, hM*0.43);
+                } else if (sim2Temp === 100) {
+                    // Boiling liquid state with bubbles and rising steam clouds
+                    ctxM.fillStyle = '#38bdf8';
+                    ctxM.fillRect(wM*0.355, hM*0.45, wM*0.29, hM*0.43);
+
+                    // Dynamic bubbles rising
+                    ctxM.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                    for (let b=0; b<6; b++) {
+                        let bx = wM*0.38 + ((b * 19) % (wM*0.24));
+                        let by = hM*0.45 + ((b * 10 + Date.now()*0.05) % (hM*0.4));
+                        ctxM.beginPath(); ctxM.arc(bx, by, 3, 0, Math.PI*2); ctxM.fill();
+                    }
+
+                    // Gas steam particles emerging from surface
+                    ctxM.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                    for (let g=0; g<5; g++) {
+                        let gx = wM*0.4 + ((g * 17) % (wM*0.2));
+                        let gy = hM*0.15 + ((g * 11 + Date.now()*0.02) % (hM*0.25));
+                        ctxM.beginPath(); ctxM.arc(gx, gy, 5, 0, Math.PI*2); ctxM.fill();
+                    }
+                } else {
+                    // Superheated steam gas phase filling whole space randomly
+                    ctxM.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                    for (let g=0; g<12; g++) {
+                        let gx = wM*0.37 + ((g * 23 + Date.now()*0.01) % (wM*0.26));
+                        let gy = hM*0.15 + ((g * 19 + Date.now()*0.03) % (hM*0.7));
+                        ctxM.beginPath(); ctxM.arc(gx, gy, 4, 0, Math.PI*2); ctxM.fill();
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+
+```
