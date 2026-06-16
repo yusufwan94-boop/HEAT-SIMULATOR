@@ -1,0 +1,742 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gas Laws Virtual Laboratory</title>
+    <!-- Tailwind CSS for playful, ultra-responsive school layout -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Google Fonts for joyful typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f0fdf4; /* Soft warm green */
+        }
+        .heading-font {
+            font-family: 'Fredoka', sans-serif;
+        }
+        .display-screen {
+            background-color: #0c1524;
+            box-shadow: inset 0 0 20px rgba(34, 197, 94, 0.25);
+        }
+    </style>
+</head>
+<body class="p-3 md:p-6 text-gray-800">
+
+    <!-- HEADER BLOCK -->
+    <header class="max-w-6xl mx-auto bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 rounded-3xl p-6 shadow-xl mb-6 border-4 border-white flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="text-center sm:text-left">
+            <h1 class="heading-font text-3xl md:text-4xl text-white font-bold drop-shadow-md tracking-wide">
+                💨 Gas Laws Virtual Lab
+            </h1>
+            <p class="text-white text-sm font-semibold opacity-95 mt-1 animate-pulse" id="main-subtitle">
+                Discover Boyle's, Charles's, and Gay-Lussac's Laws!
+            </p>
+        </div>
+        <button onclick="toggleLanguage()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-2xl shadow-md border-2 border-white transform active:scale-95 transition cursor-pointer flex items-center gap-2">
+            🌐 <span id="lang-btn-text">Bahasa Melayu</span>
+        </button>
+    </header>
+
+    <!-- TAB NAVIGATION -->
+    <nav class="max-w-6xl mx-auto grid grid-cols-3 gap-2 mb-6">
+        <button onclick="switchTab(1)" id="tab1" class="heading-font font-bold p-3 rounded-2xl border-b-4 transition text-xs md:text-base cursor-pointer bg-emerald-400 border-emerald-600 text-white shadow-md">
+            🧪 Boyle's Law
+        </button>
+        <button onclick="switchTab(2)" id="tab2" class="heading-font font-bold p-3 rounded-2xl border-b-4 transition text-xs md:text-base cursor-pointer bg-white border-gray-300 text-gray-600 hover:bg-gray-50">
+            🎈 Charles's Law
+        </button>
+        <button onclick="switchTab(3)" id="tab3" class="heading-font font-bold p-3 rounded-2xl border-b-4 transition text-xs md:text-base cursor-pointer bg-white border-gray-300 text-gray-600 hover:bg-gray-50">
+            🔥 Gay-Lussac's Law
+        </button>
+    </nav>
+
+    <!-- EXPERIMENT CORE PANELS -->
+    <main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- LEFT PANEL: HISTORY, REAL-LIFE APPLICATION, CONTROLS (4 Cols) -->
+        <div class="lg:col-span-5 flex flex-col gap-6">
+            
+            <!-- CONTROLS CARD -->
+            <div class="bg-white rounded-3xl p-5 shadow-xl border-4 border-emerald-400">
+                <h3 class="heading-font text-xl font-bold text-emerald-600 mb-4 flex items-center gap-2">
+                    🎛️ <span data-key="ctrl_panel">Experimental Controls</span>
+                </h3>
+
+                <!-- Variable Slider 1 (Dynamic context bound to current tab) -->
+                <div class="mb-4">
+                    <label class="block font-semibold text-xs mb-1 text-gray-700 flex justify-between">
+                        <span id="slider-title-1">Volume ($V$)</span>
+                        <span id="slider-val-1" class="text-emerald-600 font-bold">5.0 ml</span>
+                    </label>
+                    <input type="range" id="control-slider" min="10" max="100" value="50" oninput="handleSliderChange()" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+                </div>
+
+                <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-200 text-xs text-gray-600 leading-relaxed font-semibold">
+                    <span class="text-emerald-800 font-bold block mb-1">📝 <span data-key="current_state">Current Gas State:</span></span>
+                    <div class="grid grid-cols-3 gap-2 text-center text-slate-700 mt-2">
+                        <div class="bg-white p-2 rounded-lg border border-emerald-100">
+                            <span class="block text-[10px] text-gray-400">P</span>
+                            <span id="state-p" class="font-bold text-sm">1.0 atm</span>
+                        </div>
+                        <div class="bg-white p-2 rounded-lg border border-emerald-100">
+                            <span class="block text-[10px] text-gray-400">V</span>
+                            <span id="state-v" class="font-bold text-sm">50.0 ml</span>
+                        </div>
+                        <div class="bg-white p-2 rounded-lg border border-emerald-100">
+                            <span class="block text-[10px] text-gray-400">T</span>
+                            <span id="state-t" class="font-bold text-sm">300 K</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HISTORY / SCIENCE ORIGIN CARD -->
+            <div class="bg-white rounded-3xl p-5 shadow-xl border-4 border-teal-400 flex-grow">
+                <h3 class="heading-font text-xl font-bold text-teal-600 mb-2 flex items-center gap-2">
+                    📖 <span data-key="sci_history">Scientific History</span>
+                </h3>
+                <div class="flex gap-4 items-start">
+                    <div class="w-16 h-16 bg-gradient-to-br from-teal-400 to-indigo-500 rounded-2xl flex items-center justify-center text-white text-3xl font-bold shrink-0 shadow-md">
+                        🎓
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-sm text-teal-900" id="scientist-name">Robert Boyle</h4>
+                        <p class="text-xs text-slate-500 italic" id="scientist-years">1627 - 1691</p>
+                        <p class="text-xs text-slate-600 leading-relaxed mt-2" id="historical-context">
+                            Discover how squeezing a constant volume of gas particles forces pressure to increase exponentially inside a closed syringe system.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REAL WORLD APPLICATIONS CARD -->
+            <div class="bg-white rounded-3xl p-5 shadow-xl border-4 border-indigo-400">
+                <h3 class="heading-font text-xl font-bold text-indigo-600 mb-3 flex items-center gap-2">
+                    💡 <span data-key="real_app">Real Life Application</span>
+                </h3>
+                <div class="bg-indigo-50 p-4 rounded-2xl border border-indigo-100 flex gap-4 items-center">
+                    <div id="application-icon" class="text-4xl p-2 bg-white rounded-xl shadow-sm shrink-0">💉</div>
+                    <div>
+                        <h4 class="font-extrabold text-sm text-indigo-950" id="app-title">Medical Syringe plunger</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed mt-1" id="app-desc">
+                            Pulling the plunger increases the volume inside the chamber, lowering the pressure. Atmospheric pressure then pushes the fluid up into the syringe!
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT PANEL: INTERACTIVE APPARATUS & LIVE GRAPHS (8 Cols) -->
+        <div class="lg:col-span-7 flex flex-col gap-6">
+            
+            <!-- APPARATUS CHAMBER VISUALIZER -->
+            <div class="bg-slate-900 rounded-3xl p-4 border-4 border-slate-700 shadow-2xl flex flex-col items-center">
+                <span class="text-xs font-bold text-emerald-400 tracking-wider uppercase mb-2" id="apparatus-title">Boyle's Syringe Apparatus & Gauge</span>
+                <div class="w-full aspect-[16/9] min-h-[220px] bg-slate-950 rounded-2xl relative overflow-hidden">
+                    <canvas id="canvas-experiment" class="w-full h-full"></canvas>
+                </div>
+            </div>
+
+            <!-- GRAPHS & MOLECULAR SPEED RAMP -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                <!-- Graph Chart screen -->
+                <div class="display-screen rounded-3xl p-4 border-4 border-slate-700 flex flex-col items-center">
+                    <span class="text-xs font-bold text-cyan-400 tracking-wider uppercase mb-1" id="graph-y-axis-title">Pressure ($P$) vs Volume ($V$)</span>
+                    <div class="w-full aspect-square bg-slate-950/40 rounded-xl relative">
+                        <canvas id="canvas-graph" class="w-full h-full"></canvas>
+                    </div>
+                </div>
+
+                <!-- Particle collision / kinetic playground -->
+                <div class="bg-slate-900 rounded-3xl p-4 border-4 border-slate-700 flex flex-col items-center justify-between">
+                    <div class="text-center">
+                        <span class="text-xs font-bold text-orange-400 tracking-wider uppercase block" data-key="particle_view">Microscopic Particle Action</span>
+                        <span class="text-[9px] text-slate-500 block mt-0.5" id="gas-state-label">Constant Temperature Environment</span>
+                    </div>
+                    <div class="w-full flex-grow aspect-square max-h-[180px] bg-slate-950/80 rounded-xl border border-slate-800 my-2 relative overflow-hidden">
+                        <canvas id="canvas-particles" class="w-full h-full"></canvas>
+                    </div>
+                    <div class="w-full text-center bg-slate-950 py-1.5 px-3 rounded-lg border border-slate-800 text-[11px] text-slate-400 font-medium">
+                        💥 <span data-key="wall_collisions">Wall Collisions Rate:</span> <span id="collision-rate" class="font-extrabold text-orange-400">High</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER SIGNATURE -->
+    <footer class="max-w-6xl mx-auto text-center mt-8 pb-8 text-xs font-semibold text-slate-400 tracking-wider">
+        MRSM GERIK PHYSICS DEPT © 2026 • DESIGNED FOR HIGH PERFORMANCE INTERACTIVE EDUCATION
+    </footer>
+
+    <!-- INTERACTIVE DATA AND LOCALIZED TEXT DICTIONARY -->
+    <script>
+        const langData = {
+            en: {
+                main_subtitle: "Discover Boyle's, Charles's, and Gay-Lussac's Laws!",
+                ctrl_panel: "Experimental Controls",
+                current_state: "Current Gas State:",
+                sci_history: "Scientific History",
+                real_app: "Real Life Application",
+                particle_view: "Microscopic Particle Action",
+                wall_collisions: "Wall Collisions Rate:",
+                apparatus_setup: "Interactive Apparatus Chamber",
+
+                // Boyle's details
+                boyle_title: "Boyle's Syringe Apparatus & Gauge",
+                boyle_sc: "Robert Boyle",
+                boyle_sc_years: "1627 - 1691",
+                boyle_history: "Robert Boyle studied gas properties in 1662. He proved that squeezing gas particles into a smaller volume forces pressure to climb proportionally, as long as temperature remains constant ($P \\propto \\frac{1}{V}$).",
+                boyle_app_title: "Medical Syringe Plunger",
+                boyle_app_desc: "Pulling the plunger increases volume, reducing pressure inside. Atmospheric pressure outside pushes liquids up into the lower pressure zone.",
+                boyle_graph: "Pressure ($P$) vs Volume ($V$)",
+
+                // Charles's details
+                charles_title: "Charles's Thermal Expansion Flask",
+                charles_sc: "Jacques Charles",
+                charles_sc_years: "1746 - 1823",
+                charles_history: "Jacques Charles discovered in 1787 that heating a gas expands its volume linearly, provided pressure is kept constant ($V \\propto T$). This foundational observation led to the concept of Absolute Zero.",
+                charles_app_title: "Hot Air Balloons",
+                charles_app_desc: "Burning fuel heats air inside the envelope, expanding its volume. This lowers density compared to surrounding air, generating upward buoyancy lift.",
+                charles_graph: "Volume ($V$) vs Temperature ($T$)",
+
+                // Gay Lussac details
+                gay_title: "Gay-Lussac's Constant-Volume Container",
+                gay_sc: "Joseph Louis Gay-Lussac",
+                gay_sc_years: "1778 - 1850",
+                gay_history: "Joseph Gay-Lussac established in 1802 that heating gas inside a rigid container forces molecules to collide more energetically, driving internal pressure up ($P \\propto T$).",
+                gay_app_title: "Car Tyre Air Pressure",
+                gay_app_desc: "Driving on hot highways raises tyre temperatures, expanding internal gas kinetic speed and hiking gauge pressure, risking bursts on hot days.",
+                gay_graph: "Pressure ($P$) vs Temperature ($T$)"
+            },
+            ms: {
+                main_subtitle: "Kaji Hukum Boyle, Charles, dan Gay-Lussac secara Interaktif!",
+                ctrl_panel: "Kawalan Eksperimen",
+                current_state: "Keadaan Semasa Gas:",
+                sci_history: "Sejarah Saintifik",
+                real_app: "Aplikasi Kehidupan Sebenar",
+                particle_view: "Tindakan Zarah Mikroskopik",
+                wall_collisions: "Kadar Pelanggaran Dinding:",
+                apparatus_setup: "Radas Eksperimen Interaktif",
+
+                // Boyle's details
+                boyle_title: "Radas Picagari & Tolok Tekanan Boyle",
+                boyle_sc: "Robert Boyle",
+                boyle_sc_years: "1627 - 1691",
+                boyle_history: "Robert Boyle mengkaji sifat gas pada tahun 1662. Beliau membuktikan bahawa pemampatan gas ke isi padu yang lebih kecil memaksa tekanan meningkat secara berkadar songsang jika suhu dikekalkan malar ($P \\propto \\frac{1}{V}$).",
+                boyle_app_title: "Picagari Perubatan",
+                boyle_app_desc: "Menarik omboh picagari meningkatkan isi padu, mengurangkan tekanan di dalam. Tekanan atmosfera di luar menolak cecair masuk ke dalam kawasan tekanan rendah.",
+                boyle_graph: "Tekanan ($P$) vs Isi Padu ($V$)",
+
+                // Charles's details
+                charles_title: "Kelalang Pemanasan Terma Charles",
+                charles_sc: "Jacques Charles",
+                charles_sc_years: "1746 - 1823",
+                charles_history: "Jacques Charles menemui pada tahun 1787 bahawa pemanasan gas mengembangkan isi padu gas secara linear jika tekanan dikekalkan malar ($V \\propto T$). Pemerhatian ini membawa kepada takrifan Suhu Sifar Mutlak.",
+                charles_app_title: "Belon Udara Panas",
+                charles_app_desc: "Pembakaran bahan api memanaskan udara di dalam belon, mengembangkan isi padunya. Ini mengurangkan ketumpatan berbanding udara luar, menghasilkan daya apungan ke atas.",
+                charles_graph: "Isi Padu ($V$) vs Suhu ($T$)",
+
+                // Gay Lussac details
+                gay_title: "Bekas Isi Padu Tegar Gay-Lussac",
+                gay_sc: "Joseph Louis Gay-Lussac",
+                gay_sc_years: "1778 - 1850",
+                gay_history: "Joseph Gay-Lussac menetapkan pada tahun 1802 bahawa pemanasan gas di dalam bekas tegar memaksa molekul melanggar dinding dengan lebih bertenaga, lalu menaikkan tekanan gas ($P \\propto T$).",
+                gay_app_title: "Tekanan Tayar Kereta",
+                gay_app_desc: "Pemanduan di atas lebuh raya panas meningkatkan suhu tayar, menaikkan kelajuan kinetik gas di dalam lalu meningkatkan tekanan tayar, membawa risiko tayar meletup pada hari panas.",
+                gay_graph: "Tekanan ($P$) vs Suhu ($T$)"
+            }
+        };
+
+        let currentLang = 'en';
+        let currentTab = 1;
+
+        // Current variable parameters state
+        let volumeVal = 50.0; // ml
+        let pressureVal = 1.0; // atm
+        let temperatureVal = 300; // Kelvin
+
+        // Setup particles for kinetic box
+        let gasParticles = [];
+        const maxParticles = 60;
+        for (let i = 0; i < maxParticles; i++) {
+            gasParticles.push({
+                x: Math.random() * 150 + 20,
+                y: Math.random() * 150 + 20,
+                vx: (Math.random() - 0.5) * 3,
+                vy: (Math.random() - 0.5) * 3,
+                radius: 3
+            });
+        }
+
+        // INITIAL ONLOAD Setup
+        window.addEventListener('load', () => {
+            switchTab(1);
+            startSimulationTimelines();
+        });
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'ms' : 'en';
+            document.getElementById('lang-btn-text').innerText = currentLang === 'en' ? 'Bahasa Melayu' : 'English';
+            updateLanguageDOM();
+        }
+
+        function updateLanguageDOM() {
+            // Apply standard localization tags
+            document.querySelectorAll('[data-key]').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (langData[currentLang][key]) {
+                    el.innerHTML = langData[currentLang][key];
+                }
+            });
+
+            // Refresh tab information based on dynamic selections
+            if (currentTab === 1) {
+                document.getElementById('scientist-name').innerText = langData[currentLang].boyle_sc;
+                document.getElementById('scientist-years').innerText = langData[currentLang].boyle_sc_years;
+                document.getElementById('historical-context').innerText = langData[currentLang].boyle_history;
+                document.getElementById('app-title').innerText = langData[currentLang].boyle_app_title;
+                document.getElementById('app-desc').innerText = langData[currentLang].boyle_app_desc;
+                document.getElementById('application-icon').innerText = "💉";
+                document.getElementById('apparatus-title').innerText = langData[currentLang].boyle_title;
+                document.getElementById('graph-y-axis-title').innerText = langData[currentLang].boyle_graph;
+            } else if (currentTab === 2) {
+                document.getElementById('scientist-name').innerText = langData[currentLang].charles_sc;
+                document.getElementById('scientist-years').innerText = langData[currentLang].charles_sc_years;
+                document.getElementById('historical-context').innerText = langData[currentLang].charles_history;
+                document.getElementById('app-title').innerText = langData[currentLang].charles_app_title;
+                document.getElementById('app-desc').innerText = langData[currentLang].charles_app_desc;
+                document.getElementById('application-icon').innerText = "🎈";
+                document.getElementById('apparatus-title').innerText = langData[currentLang].charles_title;
+                document.getElementById('graph-y-axis-title').innerText = langData[currentLang].charles_graph;
+            } else {
+                document.getElementById('scientist-name').innerText = langData[currentLang].gay_sc;
+                document.getElementById('scientist-years').innerText = langData[currentLang].gay_sc_years;
+                document.getElementById('historical-context').innerText = langData[currentLang].gay_history;
+                document.getElementById('app-title').innerText = langData[currentLang].gay_app_title;
+                document.getElementById('app-desc').innerText = langData[currentLang].gay_app_desc;
+                document.getElementById('application-icon').innerText = "🚗";
+                document.getElementById('apparatus-title').innerText = langData[currentLang].gay_title;
+                document.getElementById('graph-y-axis-title').innerText = langData[currentLang].gay_graph;
+            }
+        }
+
+        function switchTab(tabIdx) {
+            currentTab = tabIdx;
+            
+            // Toggle active styles on tabs
+            for (let i = 1; i <= 3; i++) {
+                const tab = document.getElementById(`tab${i}`);
+                if (i === tabIdx) {
+                    tab.className = "heading-font font-bold p-3 rounded-2xl border-b-4 transition text-xs md:text-base cursor-pointer bg-emerald-400 border-emerald-600 text-white shadow-md";
+                } else {
+                    tab.className = "heading-font font-bold p-3 rounded-2xl border-b-4 transition text-xs md:text-base cursor-pointer bg-white border-gray-300 text-gray-600 hover:bg-gray-50";
+                }
+            }
+
+            // Adjust sliders range, steps, & labels accordingly
+            const slider = document.getElementById('control-slider');
+            if (tabIdx === 1) { // Boyle's: Slider controls Volume (ml) at constant Temp
+                slider.min = "20";
+                slider.max = "100";
+                slider.step = "2";
+                slider.value = "60";
+                temperatureVal = 300;
+            } else if (tabIdx === 2) { // Charles's: Slider controls Temp (K) at constant Pressure
+                slider.min = "150";
+                slider.max = "450";
+                slider.step = "5";
+                slider.value = "300";
+                pressureVal = 1.0;
+            } else { // Gay-Lussac: Slider controls Temp (K) at constant Volume
+                slider.min = "150";
+                slider.max = "450";
+                slider.step = "5";
+                slider.value = "300";
+                volumeVal = 50.0;
+            }
+
+            handleSliderChange();
+            updateLanguageDOM();
+            setTimeout(resizeCanvases, 40);
+        }
+
+        function resizeCanvases() {
+            const ids = ['canvas-experiment', 'canvas-graph', 'canvas-particles'];
+            ids.forEach(id => {
+                const c = document.getElementById(id);
+                if (c && c.offsetParent !== null) {
+                    c.width = c.clientWidth * window.devicePixelRatio;
+                    c.height = c.clientHeight * window.devicePixelRatio;
+                }
+            });
+        }
+        window.addEventListener('resize', resizeCanvases);
+
+        // Core interactive slider calculations
+        function handleSliderChange() {
+            const slider = document.getElementById('control-slider');
+            const sVal = parseFloat(slider.value);
+
+            if (currentTab === 1) {
+                // Boyle's Law: Slider value controls Volume
+                volumeVal = sVal;
+                // P = k/V -> Let's set standard k = 60 so that at 60ml, pressure is exactly 1.0 atm
+                pressureVal = 60.0 / volumeVal;
+                
+                document.getElementById('slider-title-1').innerText = currentLang === 'en' ? "Volume (V)" : "Isi Padu (V)";
+                document.getElementById('slider-val-1').innerText = `${volumeVal.toFixed(1)} ml`;
+            } else if (currentTab === 2) {
+                // Charles's Law: Slider value controls Temperature (K)
+                temperatureVal = sVal;
+                // V = kT -> Let's set standard k = 50/300 so that at 300K, volume is exactly 50.0 ml
+                volumeVal = (50.0 / 300.0) * temperatureVal;
+
+                document.getElementById('slider-title-1').innerText = currentLang === 'en' ? "Temperature (T)" : "Suhu (T)";
+                document.getElementById('slider-val-1').innerText = `${temperatureVal} K`;
+            } else {
+                // Gay-Lussac's Law: Slider value controls Temperature (K)
+                temperatureVal = sVal;
+                // P = kT -> Let's set standard k = 1.0/300 so that at 300K, pressure is exactly 1.0 atm
+                pressureVal = (1.0 / 300.0) * temperatureVal;
+
+                document.getElementById('slider-title-1').innerText = currentLang === 'en' ? "Temperature (T)" : "Suhu (T)";
+                document.getElementById('slider-val-1').innerText = `${temperatureVal} K`;
+            }
+
+            // Sync States HUD
+            document.getElementById('state-p').innerText = `${pressureVal.toFixed(2)} atm`;
+            document.getElementById('state-v').innerText = `${volumeVal.toFixed(1)} ml`;
+            document.getElementById('state-t').innerText = `${temperatureVal} K`;
+
+            // Adjust collision tag dynamically
+            const collisionSpan = document.getElementById('collision-rate');
+            const collisionSpeed = (pressureVal / volumeVal) * 100;
+            if (collisionSpeed > 2.5) {
+                collisionSpan.innerText = currentLang === 'en' ? "HIGH" : "TINGGI";
+                collisionSpan.className = "font-extrabold text-orange-400 animate-pulse";
+            } else if (collisionSpeed > 1.2) {
+                collisionSpan.innerText = currentLang === 'en' ? "MEDIUM" : "SEDERHANA";
+                collisionSpan.className = "font-extrabold text-yellow-400";
+            } else {
+                collisionSpan.innerText = currentLang === 'en' ? "LOW" : "RENDAH";
+                collisionSpan.className = "font-extrabold text-green-400";
+            }
+        }
+
+        // ==========================================
+        // DYNAMIC GRAPHICS ANIMATION ENGINE
+        // ==========================================
+        function startSimulationTimelines() {
+            function drawLoop() {
+                renderExperiment();
+                renderGraph();
+                renderParticles();
+                requestAnimationFrame(drawLoop);
+            }
+            requestAnimationFrame(drawLoop);
+        }
+
+        // 1. APPARATUS CANVAS RENDERER
+        function renderExperiment() {
+            const canvas = document.getElementById('canvas-experiment');
+            if (!canvas || canvas.offsetParent === null) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width; const h = canvas.height;
+            ctx.clearRect(0,0,w,h);
+
+            // Back background details
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(0,0,w,h);
+
+            if (currentTab === 1) {
+                // RENDER BOYLE'S PICAGARI/SYRINGE APPARATUS
+                const syringeX = w * 0.15;
+                const syringeY = h * 0.35;
+                const maxSyringeW = w * 0.45;
+                const syringeH = h * 0.3;
+
+                // Draw Syringe clear barrel container
+                ctx.strokeStyle = '#e2e8f0';
+                ctx.lineWidth = 4;
+                ctx.strokeRect(syringeX, syringeY, maxSyringeW, syringeH);
+
+                // Syringe nozzle lead
+                ctx.fillStyle = '#cbd5e1';
+                ctx.fillRect(syringeX - 25, syringeY + syringeH*0.35, 25, syringeH*0.3);
+
+                // Pressure Connection Wire leading from Nozzle nozzle up to Pressure Gauge
+                ctx.strokeStyle = '#38bdf8';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(syringeX - 12, syringeY + syringeH*0.5);
+                ctx.quadraticCurveTo(w * 0.2, h * 0.1, w * 0.75, h * 0.35);
+                ctx.stroke();
+
+                // Draw moveable Plunger/Shaft
+                // normalized volume maps to current piston shaft width
+                let normVolRatio = (volumeVal - 20) / 80; // range 20 to 100
+                let pistonLeftX = syringeX + (normVolRatio * maxSyringeW * 0.8) + 15;
+
+                // Plunger Stopper block
+                ctx.fillStyle = '#1e293b';
+                ctx.fillRect(pistonLeftX, syringeY + 4, 15, syringeH - 8);
+
+                // Plunger Rod extending out to the right
+                ctx.fillStyle = '#475569';
+                ctx.fillRect(pistonLeftX + 15, syringeY + syringeH*0.4, w * 0.35, syringeH*0.2);
+
+                // Highlight active chamber area (gas inside)
+                ctx.fillStyle = 'rgba(56, 189, 248, 0.15)';
+                ctx.fillRect(syringeX + 2, syringeY + 2, pistonLeftX - syringeX - 2, syringeH - 4);
+
+                // Draw analog Pressure Dial on right
+                drawAnalogGauge(ctx, w*0.75, h*0.45, pressureVal, 2.5);
+
+            } else if (currentTab === 2) {
+                // RENDER CHARLES'S FLASK & EXPANDING BALLOON
+                const flaskX = w * 0.35;
+                const flaskY = h * 0.55;
+
+                // Heat burner base flame
+                if (temperatureVal > 300) {
+                    ctx.fillStyle = '#ef4444';
+                    for (let f=0; f<10; f++) {
+                        let fx = flaskX - 30 + ((f * 15 + Date.now()*0.02) % 60);
+                        let fy = flaskY + 15 - (Math.random() * 20);
+                        ctx.beginPath(); ctx.arc(fx, fy, 8, 0, Math.PI*2); ctx.fill();
+                    }
+                }
+
+                // Heat burner plate
+                ctx.fillStyle = '#1e293b';
+                ctx.fillRect(flaskX - 45, flaskY + 15, 90, 8);
+
+                // Flask profile envelope outline
+                ctx.strokeStyle = '#94a3b8';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.arc(flaskX, flaskY - 10, 35, Math.PI*1.2, Math.PI*1.8, true);
+                ctx.lineTo(flaskX + 10, flaskY - 60);
+                ctx.lineTo(flaskX - 10, flaskY - 60);
+                ctx.closePath();
+                ctx.stroke();
+
+                // Draw dynamic expanding Balloon attached at neck
+                let normTempRatio = (temperatureVal - 150) / 300; // range 150 to 450
+                let balloonRad = 15 + (normTempRatio * 35);
+
+                ctx.fillStyle = '#f43f5e';
+                ctx.beginPath();
+                ctx.arc(flaskX, flaskY - 75 - balloonRad, balloonRad, 0, Math.PI*2);
+                ctx.fill();
+
+                // Tie string joining neck and balloon
+                ctx.strokeStyle = '#f43f5e';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(flaskX - 10, flaskY - 60);
+                ctx.lineTo(flaskX, flaskY - 75);
+                ctx.lineTo(flaskX + 10, flaskY - 60);
+                ctx.stroke();
+
+            } else {
+                // RENDER GAY-LUSSAC'S FIXED-VOLUME FLASK ATTACHED TO GAUGE
+                const flaskX = w * 0.3;
+                const flaskY = h * 0.55;
+
+                // Flame animation
+                if (temperatureVal > 300) {
+                    ctx.fillStyle = '#ef4444';
+                    for (let f=0; f<10; f++) {
+                        let fx = flaskX - 30 + ((f * 15 + Date.now()*0.02) % 60);
+                        let fy = flaskY + 15 - (Math.random() * 20);
+                        ctx.beginPath(); ctx.arc(fx, fy, 8, 0, Math.PI*2); ctx.fill();
+                    }
+                }
+
+                // Burner stand
+                ctx.fillStyle = '#1e293b';
+                ctx.fillRect(flaskX - 45, flaskY + 15, 90, 8);
+
+                // Constant volume round glass container
+                ctx.strokeStyle = '#cbd5e1';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.arc(flaskX, flaskY - 10, 40, 0, Math.PI*2);
+                ctx.stroke();
+
+                // Pipe leading from flask head up right into gauge
+                ctx.strokeStyle = '#cbd5e1';
+                ctx.lineWidth = 5;
+                ctx.beginPath();
+                ctx.moveTo(flaskX, flaskY - 50);
+                ctx.lineTo(flaskX, flaskY - 75);
+                ctx.lineTo(w * 0.72, flaskY - 75);
+                ctx.stroke();
+
+                // Draw analog pressure barometer gauge
+                drawAnalogGauge(ctx, w*0.75, h*0.45, pressureVal, 2.0);
+            }
+        }
+
+        function drawAnalogGauge(ctx, cx, cy, val, maxVal) {
+            // Gauge Back Circle
+            ctx.fillStyle = '#1e293b';
+            ctx.beginPath(); ctx.arc(cx, cy, 45, 0, Math.PI*2); ctx.fill();
+            ctx.strokeStyle = '#475569'; ctx.lineWidth = 3; ctx.stroke();
+
+            // Colored arch range representing safe / danger zones
+            ctx.strokeStyle = '#22c55e'; ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.arc(cx, cy, 35, Math.PI*0.8, Math.PI*1.5); ctx.stroke();
+            ctx.strokeStyle = '#ef4444';
+            ctx.beginPath(); ctx.arc(cx, cy, 35, Math.PI*1.5, Math.PI*2.2); ctx.stroke();
+
+            // Inner scale reading needle pointer
+            let normPressRatio = Math.min(Math.max(val / maxVal, 0), 1);
+            let needleAngle = Math.PI*0.8 + (normPressRatio * Math.PI * 1.4);
+
+            ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(cx + Math.cos(needleAngle)*32, cy + Math.sin(needleAngle)*32);
+            ctx.stroke();
+
+            // center core spindle button
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath(); ctx.arc(cx, cy, 6, 0, Math.PI*2); ctx.fill();
+        }
+
+        // 2. LIVE GRAPH PLOTTER
+        function renderGraph() {
+            const canvas = document.getElementById('canvas-graph');
+            if (!canvas || canvas.offsetParent === null) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width; const h = canvas.height;
+            ctx.clearRect(0,0,w,h);
+
+            // Grid markers
+            ctx.strokeStyle = '#182740'; ctx.lineWidth = 1;
+            for(let i=0; i<w; i+=25) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,h); ctx.stroke(); }
+            for(let j=0; j<h; j+=25) { ctx.beginPath(); ctx.moveTo(0,j); ctx.lineTo(w,j); ctx.stroke(); }
+
+            // X and Y Solid Axis rails
+            ctx.strokeStyle = '#059669'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(40, 15); ctx.lineTo(40, h-30); ctx.lineTo(w-15, h-30); ctx.stroke();
+
+            // Plot curve background path mapping matching constant parameters
+            ctx.strokeStyle = 'rgba(16, 185, 129, 0.3)'; ctx.lineWidth = 2; ctx.beginPath();
+
+            if (currentTab === 1) {
+                // Boyle's P vs V curve mapping
+                for (let v = 20; v <= 100; v++) {
+                    let p = 60.0 / v;
+                    let gx = 40 + ((v - 20) / 80) * (w - 70);
+                    let gy = h - 30 - (p / 3.0) * (h - 60);
+                    if (v === 20) ctx.moveTo(gx, gy); else ctx.lineTo(gx, gy);
+                }
+                ctx.stroke();
+
+                // Live active point coordinate bubble
+                let ax = 40 + ((volumeVal - 20) / 80) * (w - 70);
+                let ay = h - 30 - (pressureVal / 3.0) * (h - 60);
+                ctx.fillStyle = '#ef4444';
+                ctx.beginPath(); ctx.arc(ax, ay, 6, 0, Math.PI*2); ctx.fill();
+            } else if (currentTab === 2) {
+                // Charles's V vs T linear relationship curve mapping
+                for (let temp = 150; temp <= 450; temp++) {
+                    let vol = (50.0 / 300.0) * temp;
+                    let gx = 40 + ((temp - 150) / 300) * (w - 70);
+                    let gy = h - 30 - (vol / 75.0) * (h - 60);
+                    if (temp === 150) ctx.moveTo(gx, gy); else ctx.lineTo(gx, gy);
+                }
+                ctx.stroke();
+
+                // Live active point coordinate bubble
+                let ax = 40 + ((temperatureVal - 150) / 300) * (w - 70);
+                let ay = h - 30 - (volumeVal / 75.0) * (h - 60);
+                ctx.fillStyle = '#ef4444';
+                ctx.beginPath(); ctx.arc(ax, ay, 6, 0, Math.PI*2); ctx.fill();
+            } else {
+                // Gay-Lussac's P vs T linear curve mapping
+                for (let temp = 150; temp <= 450; temp++) {
+                    let press = (1.0 / 300.0) * temp;
+                    let gx = 40 + ((temp - 150) / 300) * (w - 70);
+                    let gy = h - 30 - (press / 1.5) * (h - 60);
+                    if (temp === 150) ctx.moveTo(gx, gy); else ctx.lineTo(gx, gy);
+                }
+                ctx.stroke();
+
+                // Live active point coordinate bubble
+                let ax = 40 + ((temperatureVal - 150) / 300) * (w - 70);
+                let ay = h - 30 - (pressureVal / 1.5) * (h - 60);
+                ctx.fillStyle = '#ef4444';
+                ctx.beginPath(); ctx.arc(ax, ay, 6, 0, Math.PI*2); ctx.fill();
+            }
+        }
+
+        // 3. MICROSCOPIC MOLECULAR PARTICLES SANDBOX
+        function renderParticles() {
+            const canvas = document.getElementById('canvas-particles');
+            if (!canvas || canvas.offsetParent === null) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width; const h = canvas.height;
+            ctx.clearRect(0,0,w,h);
+
+            // Shading background inside particle matrix
+            ctx.fillStyle = '#070a13';
+            ctx.fillRect(0,0,w,h);
+
+            // Determine volume constraint boundaries inside sandbox preview
+            // In Boyle's, the right wall moves according to Volume value
+            // In Charles's, the box boundary width scales up/down
+            // In Gay-Lussac's, the volume wall stays perfectly rigid
+            let rightWallX = w * 0.95;
+            if (currentTab === 1) {
+                // Boyle's volume: map 20ml to 100ml to X coords
+                rightWallX = w * 0.25 + ((volumeVal - 20) / 80) * (w * 0.65);
+            } else if (currentTab === 2) {
+                // Charles's volume: volume increases as temp increases
+                rightWallX = w * 0.35 + ((volumeVal - 25) / 50) * (w * 0.55);
+            }
+
+            // Draw rigid container walls
+            ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 6;
+            ctx.strokeRect(5, 5, rightWallX - 5, h - 10);
+
+            // Active velocity scales with absolute temperature parameter
+            let speedScalar = Math.sqrt(temperatureVal / 300.0); // Kinetic energy proportional to T
+
+            gasParticles.forEach(p => {
+                // Speed calculation factoring scale modifier
+                p.x += p.vx * speedScalar;
+                p.y += p.vy * speedScalar;
+
+                // Container border check collisions
+                if (p.x < 15) { p.x = 15; p.vx *= -1; }
+                if (p.x > rightWallX - 15) { p.x = rightWallX - 15; p.vx *= -1; }
+                if (p.y < 15) { p.y = 15; p.vy *= -1; }
+                if (p.y > h - 15) { p.y = h - 15; p.vy *= -1; }
+
+                // Particle glow matching state
+                ctx.fillStyle = currentTab === 2 && temperatureVal > 350 ? '#ef4444' : '#06b6d4';
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI*2);
+                ctx.fill();
+            });
+        }
+    </script>
+</body>
+</html>
+
+```
